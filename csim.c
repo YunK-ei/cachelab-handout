@@ -10,11 +10,15 @@
 
 FILE * tracptr;
 
+int ** record = NULL;
+
 char * buf = NULL;
 
 char * code = NULL;
 
 char *** bptr = NULL;
+
+char * temp = NULL;
 
 //cmd_bit of instructions
 char cmd;
@@ -48,8 +52,6 @@ int block_num = 0 ;
 int set_num = 0;
 
 void parse(){
-   
-    
     if (buf[0] == 'I'){
             cmd = 'I';
             return;
@@ -79,7 +81,7 @@ void parse(){
         }
         while (tail < 64)
         {
-            code[63 - tail] = '0';
+            code[63 - tail] = '0';//code form "00...00_addr__set_code__block_code__"
             tail += 1;
         }
         block_num = 0;
@@ -94,18 +96,28 @@ void parse(){
             set_num += (int) (code[62 - block_bit - k] - '0') * bit;
             bit *= 2;
         }
+
+        strncpy(temp, code, 64 - block_bit - set_bit);
     } 
 }
 
 void init(){
-    buf = (char *) malloc(32);
-    code = (char *) malloc(64);
-    bptr = (char ***) malloc(sizeof(char **) * set);
+    buf = (char *) calloc(32, sizeof(char));
+    code = (char *) calloc(64, sizeof(char));
+    bptr = (char ***) calloc(set, sizeof(char **));
+    record = (int **) calloc(set, sizeof(int*));
+    temp = (char *) calloc(64, sizeof(char));
+    for(int i = 0; i < set; i++){   
+        record[i] = (int *)calloc(lps, sizeof(int)); 
+    }
     for(int i = 0; i < set; i++)
-        bptr[i] = (char **) malloc(sizeof(char *) * lps);
+        bptr[i] = (char **) calloc(lps, sizeof(char *));
     for(int i = 0; i < set; i++)
         for(int j = 0; j < lps; j++)
-            bptr[i][j] = (char *) malloc(64);
+        {
+            bptr[i][j] = (char *) calloc(64, sizeof(char));
+            bptr[i][j][0] = '0';//set the effective flag to zero             
+        }
     
 }
 
@@ -126,6 +138,17 @@ void judge(){
     }
 }
 
+void load()
+{
+     
+}
+
+void store()
+{
+    
+}
+
+
 int main(int argc, char *argv[])
 {
 	int op; 
@@ -138,8 +161,7 @@ int main(int argc, char *argv[])
                     putchar(ch);
                     ch = fgetc(fp);
                 }
-                fclose(fp);
-                getchar();
+                fclose(fp);   
                 return 0;
             case 'v':
                 ver = 1;
@@ -165,12 +187,16 @@ int main(int argc, char *argv[])
                             parse(); 
                             judge();
                     }
-                   
+                fclose(fp);  
                 }
                     
         }
 	}
     free(buf);    
+    free(code);
+    free(record);
+    free(bptr);
+    free(temp);
     printf("%d, %d, %d", set, lps, block);
 	printSummary(hit_count, miss_count, eviction_count);
 	return 0;	
