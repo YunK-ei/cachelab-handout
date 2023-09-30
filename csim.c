@@ -59,11 +59,11 @@ void parse(){
 
     else{
         cmd = buf[1];
-        int i = 2, addr_len = 0, temp = 0, tail = 1, bit = 1;
+        int i = 3, addr_len = 0, temp = 0, tail = 1, bit = 1;
         while (buf[i] != ','){ 
             addr_len += 1, i += 1;
         } 
-        size = atoi(buf[i+1]);
+        size = atoi(buf + i + 1);
         addr_len = addr_len * 4;
         assert(addr_len < 64);
         i -= 1;
@@ -97,7 +97,7 @@ void parse(){
             bit *= 2;
         }
 
-        strncpy(temp, code, 64 - block_bit - set_bit);
+        strncpy(temp_ch, code, 64 - block_bit - set_bit);
     } 
 }
 
@@ -119,23 +119,6 @@ void init(){
             bptr[i][j][0] = '0';//set the effective flag to zero             
         }
     
-}
-
-void judge(){                
-    switch(cmd){
-        case 'I':
-            return;
-        case 'L':
-            load();
-            break;
-        case 'S':
-            store();
-            break;
-        case 'M':
-            load();
-            store();
-            break;
-    }
 }
 
 void load()
@@ -200,6 +183,24 @@ void store()
 }
 
 
+void judge(){                
+    switch(cmd){
+        case 'I':
+            return;
+        case 'L':
+            load();
+            break;
+        case 'S':
+            store();
+            break;
+        case 'M':
+            load();
+            store();
+            break;
+    }
+}
+
+
 int main(int argc, char *argv[])
 {
 	int op; 
@@ -249,19 +250,9 @@ int main(int argc, char *argv[])
     free(code);
     free(record);
     free(bptr);
-    free(temp);
+    free(temp_ch);
     printf("%d, %d, %d", set, lps, block);
 	printSummary(hit_count, miss_count, eviction_count);
 	return 0;	
-}
-
-
-
-
-
-
-
-
-
-   
+} 
 
