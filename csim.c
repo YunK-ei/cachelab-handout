@@ -133,10 +133,10 @@ void load()
             strcpy(bptr[set_num][i] + 1, temp_ch);
             record[set_num][i] += 1;
             miss_count += 1;
-            hit_count += 1;
+            
             bptr[set_num][i][0] = '1';
             if(ver)
-                printf(" :1 miss, 1 hit\n");
+                printf(" : miss\n");
             return;
         }
 
@@ -154,7 +154,7 @@ void load()
                 record[set_num][i] += 1;
                 hit_count += 1;
                 if(ver)
-                    printf(" :1 hit\n");
+                    printf(" : hit\n");
                 return;
             }
             else
@@ -172,13 +172,45 @@ void load()
     strcpy((bptr[set_num][temp_order] + 1), temp_ch);
     record[set_num][temp_order] += 1;
     eviction_count += 1;
+    miss_count += 1;
     if(ver)
-        printf(" :1 eviction\n");
+    {
+        printf(" : miss\n");
+        printf(" : eviction\n");
+    }
     return;
 }
-
+//wire through && not-write-allocate
 void store()
 {
+    int i;
+    for(i = 0; i < lps; i++)
+    {
+        if(bptr[set_num][i][0] == '0')
+        {
+            if(ver)
+                printf(" : miss\n");
+            record[set_num][i] += 1;
+            miss_count += 1;
+            bptr[set_num][i][0] = '1';
+            strcpy(bptr[set_num][i] + 1, temp_ch);
+            return;
+        }
+        else
+        {
+            if((strcmp(temp_ch, bptr[set_num][i] + 1)) == 0)
+            {
+                if(ver)
+                    printf(" : hit\n");
+                record[set_num][i] += 1;
+                hit_count += 1;
+                return;
+            }
+        }
+    }
+    if(ver)
+        printf(" : hit\n");
+    hit_count += 1;       
     return;
 }
 
@@ -250,8 +282,7 @@ int main(int argc, char *argv[])
     free(code);
     free(record);
     free(bptr);
-    free(temp_ch);
-    printf("%d, %d, %d\n", set, lps, block);
+    free(temp_ch); 
 	printSummary(hit_count, miss_count, eviction_count);
 	return 0;	
 } 
