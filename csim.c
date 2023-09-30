@@ -18,7 +18,7 @@ char * code = NULL;
 
 char *** bptr = NULL;
 
-char * temp = NULL;
+char * temp_ch = NULL;
 
 //cmd_bit of instructions
 char cmd;
@@ -106,7 +106,7 @@ void init(){
     code = (char *) calloc(64, sizeof(char));
     bptr = (char ***) calloc(set, sizeof(char **));
     record = (int **) calloc(set, sizeof(int*));
-    temp = (char *) calloc(64, sizeof(char));
+    temp_ch = (char *) calloc(64, sizeof(char));
     for(int i = 0; i < set; i++){   
         record[i] = (int *)calloc(lps, sizeof(int)); 
     }
@@ -140,23 +140,76 @@ void judge(){
 
 void load()
 {
-     
+    int temp_order = 0;
+    int temp_val = 0;
+    bool init = 0;
+    for(int i = 0; i < lps; i++)
+    {
+        if(bptr[set_num][i][0] = '0')
+        {
+            strcpy(temp_ch, bptr[set_num][i] + 1);
+            record[set_num][i] += 1;
+            miss_count += 1;
+            hit_count += 1;
+            if(ver)
+                printf(" :1 miss, 1 hit\n");
+            return;
+        }
+
+        else
+        {
+            if(!init)
+            {
+                temp_val = record[set_num][0];
+                init = 1;
+            }
+            else
+            {
+                if(strcmp(temp_ch, (bptr[set_num][i] + 1)) == 0)
+                {
+                    record[set_num][i] += 1;
+                    hit_count += 1;
+                    if(ver)
+                        printf(" :1 hit\n");
+                    return;
+                }
+                else
+                {
+
+                    if(record[set_num][i] < temp_val)
+                    {
+                        temp_val = record[set_num][i];
+                        temp_order = i;
+                    }
+                }
+
+            }
+        }
+    }
+    strcpy(temp_ch, (bptr[set_num][temp_order] + 1));
+    record[set_num][temp_order] += 1;
+    eviction_count += 1;
+    if(ver)
+        printf(" :1 eviction\n");
+    return;
 }
 
 void store()
 {
-    
+    return;
 }
 
 
 int main(int argc, char *argv[])
 {
 	int op; 
+    FILE * fp;
+    char ch;
 	while ((op = getopt(argc, argv, "-hvs:E:b:t:")) != -1){
         switch(op){
             case 'h':
-                FILE * fp = fopen("./help.txt", "r");
-                char ch = fgetc(fp);
+                fp = fopen("./help.txt", "r");
+                ch = fgetc(fp);
                 while (!feof(fp)){
                     putchar(ch);
                     ch = fgetc(fp);
