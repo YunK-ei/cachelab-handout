@@ -51,7 +51,7 @@ int block_num = 0 ;
 //code the set_bit of code to set_code
 int set_num = 0;
 
-void parse(){
+void myparse(){
     if (buf[0] == 'I'){
             cmd = 'I';
             return;
@@ -75,9 +75,9 @@ void parse(){
                     code[63 - tail] = (char) ('0' + temp % 2);
                     temp = temp / 2;
                     tail += 1;
-                    k += 1;
+                    
                 }
-            i += 1;
+            i -= 1;
         }
         while (tail < 64)
         {
@@ -97,7 +97,7 @@ void parse(){
             bit *= 2;
         }
 
-        strncpy(temp_ch, code, 64 - block_bit - set_bit);
+        strncpy(temp_ch, code, 63 - block_bit - set_bit);
     } 
 }
 
@@ -128,12 +128,13 @@ void load()
     bool init = 0;
     for(int i = 0; i < lps; i++)
     {
-        if(bptr[set_num][i][0] = '0')
+        if((bptr[set_num][i][0] == '0'))
         {
-            strcpy(temp_ch, bptr[set_num][i] + 1);
+            strcpy(bptr[set_num][i] + 1, temp_ch);
             record[set_num][i] += 1;
             miss_count += 1;
             hit_count += 1;
+            bptr[set_num][i][0] = '1';
             if(ver)
                 printf(" :1 miss, 1 hit\n");
             return;
@@ -146,30 +147,29 @@ void load()
                 temp_val = record[set_num][0];
                 init = 1;
             }
+            
+            
+            if(strcmp(temp_ch, (bptr[set_num][i] + 1)) == 0)
+            {
+                record[set_num][i] += 1;
+                hit_count += 1;
+                if(ver)
+                    printf(" :1 hit\n");
+                return;
+            }
             else
             {
-                if(strcmp(temp_ch, (bptr[set_num][i] + 1)) == 0)
-                {
-                    record[set_num][i] += 1;
-                    hit_count += 1;
-                    if(ver)
-                        printf(" :1 hit\n");
-                    return;
-                }
-                else
-                {
 
-                    if(record[set_num][i] < temp_val)
-                    {
-                        temp_val = record[set_num][i];
-                        temp_order = i;
-                    }
+                if(record[set_num][i] < temp_val)
+                {
+                    temp_val = record[set_num][i];
+                    temp_order = i;
                 }
-
             }
+
         }
     }
-    strcpy(temp_ch, (bptr[set_num][temp_order] + 1));
+    strcpy((bptr[set_num][temp_order] + 1), temp_ch);
     record[set_num][temp_order] += 1;
     eviction_count += 1;
     if(ver)
@@ -237,12 +237,12 @@ int main(int argc, char *argv[])
                 while (!feof(tracptr)){
                     if(fgets(buf, 63, tracptr)){
                             if(ver)
-                                printf("%s//", buf);
-                            parse(); 
+                                printf("%s", buf);
+                            myparse(); 
                             judge();
-                    }
-                fclose(fp);  
+                    } 
                 }
+                fclose(tracptr);
                     
         }
 	}
@@ -251,7 +251,7 @@ int main(int argc, char *argv[])
     free(record);
     free(bptr);
     free(temp_ch);
-    printf("%d, %d, %d", set, lps, block);
+    printf("%d, %d, %d\n", set, lps, block);
 	printSummary(hit_count, miss_count, eviction_count);
 	return 0;	
 } 
