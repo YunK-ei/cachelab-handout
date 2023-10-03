@@ -69,7 +69,13 @@ void myparse(){
         i -= 1;
         //hex2binary
         while (buf[i] != ' '){
-            temp = (int) (buf[i] - '0');
+            if(buf[i] >= '0' && buf[i] <= '9')
+                temp = (int) (buf[i] - '0');
+            else
+            {
+                temp = (int) (buf[i] - 'a');
+                temp += 10;
+            }
             for(int k = 0; k < 4; ++k)
                 {
                     code[63 - tail] = (char) ('0' + temp % 2);
@@ -183,35 +189,7 @@ void load()
 //wire through && not-write-allocate
 void store()
 {
-    int i;
-    for(i = 0; i < lps; i++)
-    {
-        if(bptr[set_num][i][0] == '0')
-        {
-            if(ver)
-                printf(" : miss\n");
-            record[set_num][i] += 1;
-            miss_count += 1;
-            bptr[set_num][i][0] = '1';
-            strcpy(bptr[set_num][i] + 1, temp_ch);
-            return;
-        }
-        else
-        {
-            if((strcmp(temp_ch, bptr[set_num][i] + 1)) == 0)
-            {
-                if(ver)
-                    printf(" : hit\n");
-                record[set_num][i] += 1;
-                hit_count += 1;
-                return;
-            }
-        }
-    }
-    if(ver)
-        printf(" : hit\n");
-    hit_count += 1;       
-    return;
+        
 }
 
 
@@ -223,11 +201,11 @@ void judge(){
             load();
             break;
         case 'S':
-            store();
+            load();
             break;
         case 'M':
             load();
-            store();
+            load();
             break;
     }
 }
