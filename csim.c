@@ -187,10 +187,7 @@ void load()
     return;
 }
 //wire through && not-write-allocate
-void store()
-{
-        
-}
+
 
 
 void judge(){                
